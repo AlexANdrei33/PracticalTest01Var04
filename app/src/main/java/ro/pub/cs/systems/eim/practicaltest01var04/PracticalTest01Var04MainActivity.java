@@ -1,5 +1,6 @@
 package ro.pub.cs.systems.eim.practicaltest01var04;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,6 +9,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,6 +21,7 @@ public class PracticalTest01Var04MainActivity extends AppCompatActivity {
     private EditText classNumberEditText;
     private CheckBox studentNameCheckBox;
     private CheckBox classNumberCheckBox;
+    private ActivityResultLauncher<Intent> activityResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +40,19 @@ public class PracticalTest01Var04MainActivity extends AppCompatActivity {
                 displayInformation();
             }
         });
+
+        activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this::handleResult
+        );
+    }
+
+    private void handleResult(ActivityResult result) {
+        if (result.getResultCode() == RESULT_OK) {
+            showToast("Result: OK");
+        } else if (result.getResultCode() == RESULT_CANCELED) {
+            showToast("Result: Canceled");
+        }
     }
 
     private void displayInformation() {
@@ -60,6 +78,11 @@ public class PracticalTest01Var04MainActivity extends AppCompatActivity {
 
         TextView studentInfoTextView = findViewById(R.id.text_view_student_info);
         studentInfoTextView.setText(info);
+
+        Intent intent = new Intent(PracticalTest01Var04MainActivity.this, PracticalTest01Var04SecondaryActivity.class);
+        intent.putExtra(Constants.STUDENT_NAME, studentName);
+        intent.putExtra(Constants.CLASS_NUMBER, classNumber);
+        activityResultLauncher.launch(intent);
     }
 
     private void showToast(String message) {
